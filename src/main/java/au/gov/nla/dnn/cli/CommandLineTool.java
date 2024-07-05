@@ -33,6 +33,7 @@ public class CommandLineTool
                     {
                         TrainingExecution execution = new TrainingExecution();
                         execution.execute(loadConfig(args[1]), args[2], args[3], args[4]);
+                        return;
                     }
                     
                     break;
