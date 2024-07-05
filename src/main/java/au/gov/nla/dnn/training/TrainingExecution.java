@@ -16,6 +16,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import au.gov.nla.dnn.evaluation.ModelEvaluationResult;
 import au.gov.nla.dnn.model.ModelInstance;
 import au.gov.nla.dnn.record.RawDataRecordProvider;
 import au.gov.nla.dnn.sequence.InputSequence;
@@ -25,7 +27,7 @@ import au.gov.nla.dnn.sequence.SequenceDataRecordProvider;
 
 public class TrainingExecution
 {
-    public void execute(JSONObject config, String tempDirectory, String saveFile) throws Exception
+    public void execute(JSONObject config, String tempDirectory, String modelSaveFile, String evalSaveFile) throws Exception
     {
         Consumer<Exception> errorHandler = new Consumer<Exception>(){
             public void accept(Exception e)
@@ -119,11 +121,17 @@ public class TrainingExecution
         InputSequence sequence = (InputSequence)Class.forName(config.getString("input-sequence")).getConstructor().newInstance();
         InputSequenceInstance sequenceInstance = sequence.generateInstance(labels, config.getJSONObject("input-sequence-config"));
         
+        System.out.println("Pre-processing raw input data...");
+        
         sequenceInstance.preProcess(randomSeed, trainingRecordProvider);
         trainingRecordProvider.reset();
         
+        System.out.println("Generating sequence data...");
+        
         generateSequenceData(dataTempDirectoryFT, sequenceInstance, trainingRecordProvider);
         generateSequenceData(dataTempDirectoryFE, sequenceInstance, evaluationRecordProvider);
+        
+        System.out.println("Starting model training...");
         
         TrainingListener trainingListener = new TrainingListener(){
             public void onEpochComplete(int epoch, int bestEpoch, double bestEpochScore)
@@ -132,11 +140,28 @@ public class TrainingExecution
             }
         };
         
+        SequenceDataRecordProvider trainingSequenceDataRecordProvider = createSequenceDataRecordProvider(dataTempDirectoryFT, randomSeed);
+        SequenceDataRecordProvider evaluationSequenceDataRecordProvider = createSequenceDataRecordProvider(dataTempDirectoryFE, randomSeed);
+        
         modelInstance.train(hyperParameters, sequenceInstance.getFeatureCount(), labels, modelTempDirectoryF.getAbsolutePath(), 
                 trainingListener, 
                 errorHandler, 
-                createSequenceDataRecordProvider(dataTempDirectoryFT, randomSeed), 
-                createSequenceDataRecordProvider(dataTempDirectoryFE, randomSeed));
+                trainingSequenceDataRecordProvider, 
+                evaluationSequenceDataRecordProvider);
+        
+        try(FileOutputStream out = new FileOutputStream(modelSaveFile))
+        {
+            modelInstance.save(out);
+        }
+        
+        System.out.println("Training complete. Model saved to "+modelSaveFile+".");
+        System.out.println("Performing evaluation...");
+        
+        ModelEvaluationResult evaluation = modelInstance.evaluate(evaluationSequenceDataRecordProvider, hyperParameters.getBatchSize(), 
+                sequenceInstance.getFeatureCount(), labels, errorHandler);
+        Files.write(new File(evalSaveFile).toPath(), evaluation.toJSON().toString().getBytes());
+        
+        System.out.println("Evaluation complete. Statistics saved to "+evalSaveFile+".");
     }
     
     private SequenceDataRecordProvider createSequenceDataRecordProvider(File directory, long randomSeed) throws Exception

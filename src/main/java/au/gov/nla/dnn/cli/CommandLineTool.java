@@ -29,10 +29,10 @@ public class CommandLineTool
                 }
                 case "-train":
                 {
-                    if(args.length==4)
+                    if(args.length==5)
                     {
                         TrainingExecution execution = new TrainingExecution();
-                        execution.execute(loadConfig(args[1]), args[2], args[3]);
+                        execution.execute(loadConfig(args[1]), args[2], args[3], args[4]);
                     }
                     
                     break;
@@ -41,7 +41,7 @@ public class CommandLineTool
         }
         
         System.out.println("Usage: (either)");
-        System.out.println("-train <training-config-file> <temp-directory> <save-to-file>");
+        System.out.println("-train <training-config-file> <temp-directory> <model-dest-file> <eval-dest-file>");
         System.out.println("-inference-server <server-config-file>");
         System.exit(1);
     }

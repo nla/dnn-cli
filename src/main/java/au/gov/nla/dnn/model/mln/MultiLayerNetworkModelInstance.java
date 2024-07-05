@@ -136,7 +136,7 @@ public class MultiLayerNetworkModelInstance implements ModelInstance
     }
     
     public ModelEvaluationResult evaluate(SequenceDataRecordProvider evaluationRecordProvider, int batchSize, int featureCount, 
-            int seriesLength, List<String> labels, Consumer<Exception> errorHandler) throws Exception
+            List<String> labels, Consumer<Exception> errorHandler) throws Exception
     {
         AsyncDataSetIterator evaluationIterator = new AsyncDataSetIterator(new SequenceDataRecordIterator(batchSize, featureCount, labels, evaluationRecordProvider, errorHandler), 3, true);
         

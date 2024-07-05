@@ -2,6 +2,8 @@ package au.gov.nla.dnn.evaluation;
 
 import java.util.LinkedHashMap;
 
+import org.json.JSONObject;
+
 public class ModelEvaluationResult
 {
     private double accuracy;
@@ -104,5 +106,43 @@ public class ModelEvaluationResult
         {
             this.mcc = mcc;
         }
+    }
+    
+    public JSONObject toJSON()
+    {
+        JSONObject a = new JSONObject();
+        
+        for(String label: accuracyRatings.keySet())
+        {
+            a.put(label, accuracyRatings.get(label).doubleValue());
+        }
+        
+        JSONObject c = new JSONObject();
+        
+        for(String label: confusionMatrix.keySet())
+        {
+            ConfusionStatistics stats = confusionMatrix.get(label);
+            JSONObject s = new JSONObject();
+            
+            s.put("true-positives", stats.getTp());
+            s.put("true-negatives", stats.getTn());
+            s.put("false-positives", stats.getFp());
+            s.put("false-negatives", stats.getFn());
+            
+            s.put("precision", stats.getPrecision());
+            s.put("recall", stats.getRecall());
+            s.put("false-discovery-rate", stats.getFalseDiscoveryRate());
+            s.put("false-positive-rate", stats.getFalsePositiveRate());
+            s.put("matthews-correlation-coefficient", stats.getMcc());
+            
+            c.put(label, s);
+        }
+        
+        JSONObject o = new JSONObject();
+        o.put("accuracy", accuracy);
+        o.put("accuracy-per-label", a);
+        o.put("confusion-per-label", c);
+        
+        return o;
     }
 }

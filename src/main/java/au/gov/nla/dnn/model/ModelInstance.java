@@ -20,7 +20,7 @@ public interface ModelInstance
             SequenceDataRecordProvider trainingRecordProvider, 
             SequenceDataRecordProvider evaluationRecordProvider) throws Exception;
     public ModelEvaluationResult evaluate(SequenceDataRecordProvider evaluationRecordProvider, int batchSize, int featureCount, 
-            int seriesLength, List<String> labels, Consumer<Exception> errorHandler) throws Exception;
+            List<String> labels, Consumer<Exception> errorHandler) throws Exception;
     public double[] infer(double[] features) throws Exception;
     public void save(OutputStream stream) throws Exception;
     
