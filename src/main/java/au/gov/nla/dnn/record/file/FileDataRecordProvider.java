@@ -5,7 +5,6 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Iterator;
-import java.util.List;
 import java.util.function.Consumer;
 import org.json.JSONObject;
 import au.gov.nla.dnn.record.RawDataRecord;
@@ -17,27 +16,22 @@ public class FileDataRecordProvider implements RawDataRecordProvider
     private String directory;
     private DirectoryStream<Path> directoryStream;
     private Iterator<Path> directoryIterator;
-    private List<String> labels;
+    private String[] labels;
     private int currentLabelIndex;
     
     public void initialise(JSONObject config, Consumer<Exception> errorHandler) throws Exception
     {
         this.errorHandler = errorHandler;
         this.directory = config.getString("directory");
-        this.labels = Files.readAllLines(new File(config.getString("labels-file")).toPath());
+        this.labels = new File(directory).list();
         
         createStream();
     }
     
     private void createStream() throws Exception
     {
-        directoryStream = Files.newDirectoryStream(new File(directory+"/"+labels.get(currentLabelIndex)+"/").toPath());
+        directoryStream = Files.newDirectoryStream(new File(directory+"/"+labels[currentLabelIndex]+"/").toPath());
         directoryIterator = directoryStream.iterator();
-    }
-    
-    public List<String> getLabels()
-    {
-        return labels;
     }
     
     public void reset()
@@ -76,7 +70,7 @@ public class FileDataRecordProvider implements RawDataRecordProvider
             {
                 currentLabelIndex++;
                 
-                if(currentLabelIndex==labels.size())
+                if(currentLabelIndex==labels.length)
                 {
                     return false;
                 }
@@ -97,7 +91,7 @@ public class FileDataRecordProvider implements RawDataRecordProvider
     
     public RawDataRecord getNextRecord() throws Exception
     {
-        double[] labelSet = new double[labels.size()];
+        double[] labelSet = new double[labels.length];
         labelSet[currentLabelIndex] = 1d;
         
         return new RawDataRecord(Files.readAllBytes(directoryIterator.next()), labelSet);
