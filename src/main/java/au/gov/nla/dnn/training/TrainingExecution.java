@@ -79,10 +79,6 @@ public class TrainingExecution
                 randomSeed, 
                 evaluationMetric);
         
-        ModelInstance.Builder<?> modelBuilder = (ModelInstance.Builder<?>)Class.forName(config.getString("model-instance-builder")
-                ).getConstructor().newInstance();
-        ModelInstance modelInstance = modelBuilder.create(config.getJSONObject("model-instance-builder-config"), randomSeed);
-        
         File modelTempDirectoryF = new File(tempDirectory+"/model/");
         File dataTempDirectoryF = new File(tempDirectory+"/data/");
         File dataTempDirectoryFT = new File(tempDirectory+"/data/t/");
@@ -125,6 +121,13 @@ public class TrainingExecution
         
         sequenceInstance.preProcess(randomSeed, trainingRecordProvider);
         trainingRecordProvider.reset();
+        
+        System.out.println("Initialising model...");
+        
+        ModelInstance.Builder<?> modelBuilder = (ModelInstance.Builder<?>)Class.forName(config.getString("model-instance-builder")
+                ).getConstructor().newInstance();
+        ModelInstance modelInstance = modelBuilder.create(config.getJSONObject("model-instance-builder-config"), 
+                sequenceInstance.getFeatureCount(), labels.size(), randomSeed);
         
         System.out.println("Generating sequence data...");
         
