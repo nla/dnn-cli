@@ -5,10 +5,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -70,8 +70,7 @@ public class SocketInferenceApiAdapter implements InferenceApiAdapter
     {
         try
         {
-            try(BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                    PrintWriter writer = new PrintWriter(socket.getOutputStream()))
+            try(BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream())))
             {
                 JSONObject response = new JSONObject();
                 
@@ -87,8 +86,8 @@ public class SocketInferenceApiAdapter implements InferenceApiAdapter
                     response.put("exception", e.getClass().getName()+": "+e.getMessage());
                 }
                 
-                writer.println(response.toString());
-                writer.flush();
+                socket.getOutputStream().write(response.toString().getBytes(StandardCharsets.UTF_8));
+                socket.getOutputStream().flush();
             }
             finally
             {
