@@ -7,7 +7,6 @@ import org.json.JSONObject;
 public interface RawDataRecordProvider
 {
     public void initialise(JSONObject config, Consumer<Exception> errorHandler) throws Exception;
-    public List<String> getLabels();
     
     public void reset();
     public boolean hasMoreRecords();
