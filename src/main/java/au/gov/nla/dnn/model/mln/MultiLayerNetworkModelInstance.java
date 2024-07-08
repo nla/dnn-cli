@@ -350,7 +350,7 @@ public class MultiLayerNetworkModelInstance implements ModelInstance
     
     public static class Builder implements ModelInstance.Builder<MultiLayerNetworkModelInstance>
     {
-        public MultiLayerNetworkModelInstance create(JSONObject config, long randomSeed) throws Exception
+        public MultiLayerNetworkModelInstance create(JSONObject config, int featureCount, int labelCount, long randomSeed) throws Exception
         {
             NeuralNetConfiguration.Builder b = new NeuralNetConfiguration.Builder()
                     .weightInit(getWeightInit(config.getString("weight-init")))
@@ -360,8 +360,8 @@ public class MultiLayerNetworkModelInstance implements ModelInstance
                     .seed(randomSeed);
             
             NeuralNetConfiguration.ListBuilder definitionBuilder = b.list();
-            int inputNodes = config.getInt("input-node-count");
-            int outputNodes = config.getInt("output-node-count");
+            int inputNodes = featureCount;
+            int outputNodes = labelCount;
             int lastNodes = inputNodes;
             
             // Hidden layers
