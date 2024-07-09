@@ -83,6 +83,7 @@ public class TrainingExecution
         File dataTempDirectoryF = new File(tempDirectory+"/data/");
         File dataTempDirectoryFT = new File(tempDirectory+"/data/t/");
         File dataTempDirectoryFE = new File(tempDirectory+"/data/e/");
+        File dataTempSequenceInstance = new File(tempDirectory+"/data/i");
         
         if(!modelTempDirectoryF.exists())
         {
@@ -115,12 +116,27 @@ public class TrainingExecution
         evaluationRecordProvider.initialise(config.getJSONObject("evaluation-record-provider-config"), errorHandler);
         
         InputSequence sequence = (InputSequence)Class.forName(config.getString("input-sequence")).getConstructor().newInstance();
-        InputSequenceInstance sequenceInstance = sequence.generateInstance(labels, config.getJSONObject("input-sequence-config"));
+        InputSequenceInstance sequenceInstance;
         
-        System.out.println("Pre-processing raw input data...");
-        
-        sequenceInstance.preProcess(randomSeed, trainingRecordProvider);
-        trainingRecordProvider.reset();
+        if(config.has("reuse-cached-sequence-data") && config.getBoolean("reuse-cached-sequence-data"))
+        {
+            sequenceInstance = loadSequenceInstance(dataTempSequenceInstance);
+        }
+        else
+        {
+            sequenceInstance = sequence.generateInstance(labels, config.getJSONObject("input-sequence-config"));
+            saveSequenceInstance(sequenceInstance, dataTempSequenceInstance);
+            
+            System.out.println("Pre-processing raw input data...");
+            
+            sequenceInstance.preProcess(randomSeed, trainingRecordProvider);
+            trainingRecordProvider.reset();
+            
+            System.out.println("Generating sequence data...");
+            
+            generateSequenceData(dataTempDirectoryFT, sequenceInstance, trainingRecordProvider);
+            generateSequenceData(dataTempDirectoryFE, sequenceInstance, evaluationRecordProvider);
+        }
         
         System.out.println("Initialising model...");
         
@@ -128,11 +144,6 @@ public class TrainingExecution
                 ).getConstructor().newInstance();
         ModelInstance modelInstance = modelBuilder.create(config.getJSONObject("model-instance-builder-config"), 
                 sequenceInstance.getFeatureCount(), labels.size(), randomSeed);
-        
-        System.out.println("Generating sequence data...");
-        
-        generateSequenceData(dataTempDirectoryFT, sequenceInstance, trainingRecordProvider);
-        generateSequenceData(dataTempDirectoryFE, sequenceInstance, evaluationRecordProvider);
         
         System.out.println("Starting model training...");
         
@@ -281,6 +292,23 @@ public class TrainingExecution
             
             System.out.println("Processed raw data: "+index);
             index++;
+        }
+    }
+    
+    private InputSequenceInstance loadSequenceInstance(File file) throws Exception
+    {
+        try(ObjectInputStream in = new ObjectInputStream(new FileInputStream(file)))
+        {
+            return (InputSequenceInstance)in.readObject();
+        }
+    }
+    
+    private void saveSequenceInstance(InputSequenceInstance instance, File file) throws Exception
+    {
+        try(ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file)))
+        {
+            out.writeObject(instance);
+            out.flush();
         }
     }
     
