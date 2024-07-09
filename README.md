@@ -29,6 +29,7 @@ The JSON training configuration file has the following structure:
 
 ```
 {
+	"reuse-cached-sequence-data": false,
 	"hyper-parameters": {
 		"random-seed": 1249641284,
 		"evaluation-metric": "f1",
@@ -117,6 +118,8 @@ The specified input sequence is responsible for converting raw data (a byte arra
 The example above uses the TFIDFVectorSpaceInputSequence which produces features based on a Term Frequency Inverse Document Frequency bag of words approach.
 
 Additional input sequences can be created by implementing the InputSequence interface.
+
+Note that if reuse-cached-sequence-data (in the training config) is set to true, the input sequence data is read from the temp directory rather than processed again.
 
 Record Providers 
 ----------------
