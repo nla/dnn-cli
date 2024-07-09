@@ -60,7 +60,7 @@ The JSON training configuration file has the following structure:
 				"node-count": 100,
 				"activation-function": "RELU",
 				"layer-type": "dense"
-			},
+			}
 		],
 		"output-layer": {
 			"loss-function": "XENT"
@@ -97,7 +97,7 @@ The JSON training configuration file has the following structure:
 	},
 	"input-sequence": "au.gov.nla.dnn.sequence.text.tfidf.TFIDFVectorSpaceInputSequence",
 	"input-sequence-config": {
-		"word-split-pattern": "[^\w]",
+		"word-split-pattern": "[^\w]+",
 		"word-exclusion-patterns": [
 			"[0-9]+"
 		],
