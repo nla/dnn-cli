@@ -260,9 +260,10 @@ The properties required to be specified in the properties file for the HTTPInfer
   - cors-allowed: Whether or not to accept CORS requests (true/false).
   - cors-allowed-hosts: The value to send in the Access-Control-Allow-Origin response header.
   - cors-allowed-headers: The value to send in the Access-Control-Allow-Headers response header.
+
 Note that the properties file is a key-value style properties file, not a JSON file.
 
-To perform remote inference on a model via the HTTPInferenceApiAdapter, send a HTTP POST request to the following URL: http://<host>:<port>/infer, with the raw record data passed in the post body.
+To perform remote inference on a model via the HTTPInferenceApiAdapter, send a HTTP POST request to the following URL: http://host:port/infer, with the raw record data passed in the post body.
 The "dnn-model-id" header is required and must specify the model ID of the model you want to infer from.
 
 The HTTP response for a failed request will have the following JSON structure:
@@ -300,6 +301,7 @@ The properties required to be specified in the properties file for the SocketInf
   - backlog: The request backlog for the server socket.
   - thread-pool: The number of threads on which to process socket requests. If 0, there will be no limit.
   - max-shutdown-delay: The maximum amount of time to wait (in milliseconds) for the adapter to shutdown when the process is killed.
+
 Note that the properties file is a key-value style properties file, not a JSON file.
 
 To perform remote inference on a model via the SocketInferenceApiAdapter, connect a TCP socket and send the model ID as a string, followed by the raw record body. The following example is written using Java:
