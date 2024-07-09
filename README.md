@@ -97,7 +97,12 @@ The JSON training configuration file has the following structure:
 	},
 	"input-sequence": "au.gov.nla.dnn.sequence.text.tfidf.TFIDFVectorSpaceInputSequence",
 	"input-sequence-config": {
+		"word-split-pattern": "[^\w]",
+		"word-exclusion-patterns": [
+			"[0-9]+"
+		],
 		"word-min-characters": 3,
+		"word-max-characters": 12,
 		"word-min-occurrances": 3
 	},
 	
