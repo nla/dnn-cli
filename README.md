@@ -9,11 +9,11 @@ RUNNING TRAINING
 
 Once packaged into a JAR, training can be run from the command line:
 
-java -jar dnn-cli.jar -train <training-config> <temp-directory> <model-save-file> <eval-save-file>
+java -cp dnn-cli.jar -train \<training-config\> \<temp-directory\> \<model-save-file\> \<eval-save-file\>
 
 For example:
 
-java -jar dnn-cli.jar -train training.json temp/ models/subject_classifier.model evas/subject_classifier_eval.json
+java -cp dnn-cli.jar -train training.json temp/ models/subject_classifier.model evas/subject_classifier_eval.json
 
 **Arguments**:
   - training-config: A JSON file with the training configuration. See below for JSON config structure.
@@ -219,7 +219,7 @@ INFERENCE
 
 Once models have been trained and saved to file, you can use the following command to run a server that loads models into memory and provides remote APIs for model inference:
 
-java -jar dnn-cli.jar -inference-server <server-config>
+java -jar dnn-cli.jar -inference-server \<server-config\>
 
 For example:
 
