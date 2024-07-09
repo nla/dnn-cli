@@ -374,46 +374,46 @@ public class MultiLayerNetworkModelInstanceBuilder implements ModelInstance.Buil
             case "adagrad":
             {
                 return new AdaGrad(
-                        Double.parseDouble(params.getString("learning-rate")),
-                        Double.parseDouble(params.getString("epsilon")));
+                        params.getDouble("learning-rate"),
+                        params.getDouble("epsilon"));
             }
             case "adam":
             {
                 return new Adam(
-                        Double.parseDouble(params.getString("learning-rate")),
-                        Double.parseDouble(params.getString("beta1")),
-                        Double.parseDouble(params.getString("beta2")),
-                        Double.parseDouble(params.getString("epsilon")));
+                        params.getDouble(("learning-rate")),
+                        params.getDouble(("beta1")),
+                        params.getDouble(("beta2")),
+                        params.getDouble(("epsilon")));
             }
             case "adamax":
             {
                 return new AdaMax(
-                        Double.parseDouble(params.getString("learning-rate")),
-                        Double.parseDouble(params.getString("beta1")),
-                        Double.parseDouble(params.getString("beta2")),
-                        Double.parseDouble(params.getString("epsilon")));
+                        params.getDouble(("learning-rate")),
+                        params.getDouble(("beta1")),
+                        params.getDouble(("beta2")),
+                        params.getDouble(("epsilon")));
             }
             case "amsgrad":
             {
                 return new AMSGrad(
-                        Double.parseDouble(params.getString("learning-rate")),
-                        Double.parseDouble(params.getString("beta1")),
-                        Double.parseDouble(params.getString("beta2")),
-                        Double.parseDouble(params.getString("epsilon")));
+                        params.getDouble(("learning-rate")),
+                        params.getDouble(("beta1")),
+                        params.getDouble(("beta2")),
+                        params.getDouble(("epsilon")));
             }
             case "nadam":
             {
                 return new Nadam(
-                        Double.parseDouble(params.getString("learning-rate")),
-                        Double.parseDouble(params.getString("beta1")),
-                        Double.parseDouble(params.getString("beta2")),
-                        Double.parseDouble(params.getString("epsilon")));
+                        params.getDouble(("learning-rate")),
+                        params.getDouble(("beta1")),
+                        params.getDouble(("beta2")),
+                        params.getDouble(("epsilon")));
             }
             case "nesterovs":
             {
                 return new Nesterovs(
-                        Double.parseDouble(params.getString("learning-rate")),
-                        Double.parseDouble(params.getString("momentum")));
+                        params.getDouble(("learning-rate")),
+                        params.getDouble(("momentum")));
             }
             case "noop":
             {
@@ -422,14 +422,14 @@ public class MultiLayerNetworkModelInstanceBuilder implements ModelInstance.Buil
             case "rmsprop":
             {
                 return new RmsProp(
-                        Double.parseDouble(params.getString("learning-rate")),
-                        Double.parseDouble(params.getString("rms-decay")),
-                        Double.parseDouble(params.getString("epsilon")));
+                        params.getDouble(("learning-rate")),
+                        params.getDouble(("rms-decay")),
+                        params.getDouble(("epsilon")));
             }
             case "sgd":
             {
                 return new Nadam(
-                        Double.parseDouble(params.getString("learning-rate")));
+                        params.getDouble(("learning-rate")));
             }
             default:
             {
