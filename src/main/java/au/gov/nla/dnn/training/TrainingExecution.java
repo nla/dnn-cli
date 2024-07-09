@@ -121,6 +121,7 @@ public class TrainingExecution
         if(config.has("reuse-cached-sequence-data") && config.getBoolean("reuse-cached-sequence-data"))
         {
             sequenceInstance = loadSequenceInstance(dataTempSequenceInstance);
+            System.out.println("Loaded cached sequence data. Feature size is: "+sequenceInstance.getFeatureCount()+".");
         }
         else
         {
@@ -136,6 +137,8 @@ public class TrainingExecution
             
             generateSequenceData(dataTempDirectoryFT, sequenceInstance, trainingRecordProvider);
             generateSequenceData(dataTempDirectoryFE, sequenceInstance, evaluationRecordProvider);
+            
+            System.out.println("Sequence data processed. Feature size is: "+sequenceInstance.getFeatureCount()+".");
         }
         
         System.out.println("Initialising model...");
