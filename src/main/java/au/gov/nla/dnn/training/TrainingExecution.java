@@ -279,6 +279,7 @@ public class TrainingExecution
                 out.flush();
             }
             
+            System.out.println("Processed raw data: "+index);
             index++;
         }
     }
