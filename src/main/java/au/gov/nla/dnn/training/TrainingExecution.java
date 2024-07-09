@@ -278,6 +278,8 @@ public class TrainingExecution
                 out.writeObject(record);
                 out.flush();
             }
+            
+            index++;
         }
     }
     
