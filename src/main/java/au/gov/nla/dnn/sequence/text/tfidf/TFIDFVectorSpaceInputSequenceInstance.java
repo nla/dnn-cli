@@ -6,11 +6,16 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Properties;
 
 import au.gov.nla.dnn.record.RawDataRecord;
 import au.gov.nla.dnn.record.RawDataRecordProvider;
 import au.gov.nla.dnn.sequence.InputSequenceInstance;
 import au.gov.nla.dnn.sequence.SequenceDataRecord;
+import edu.stanford.nlp.ling.CoreAnnotations;
+import edu.stanford.nlp.ling.CoreLabel;
+import edu.stanford.nlp.pipeline.Annotation;
+import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 
 public class TFIDFVectorSpaceInputSequenceInstance implements InputSequenceInstance
 {
@@ -53,10 +58,17 @@ public class TFIDFVectorSpaceInputSequenceInstance implements InputSequenceInsta
         boolean exclude;
         words.clear();
         
+        Properties props = new Properties();
+        props.setProperty("annotators", "tokenize,ssplit,pos,lemma");
+        
+        StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
+        
         while(recordProvider.hasMoreRecords())
         {
             RawDataRecord record = recordProvider.getNextRecord();
             totalProcessedRecords++;
+            
+            // Build list of unique words
             
             HashSet<String> wordSet = new HashSet<String>();
             String data = new String(record.getData());
@@ -65,10 +77,32 @@ public class TFIDFVectorSpaceInputSequenceInstance implements InputSequenceInsta
             {
                 if(segment.length()>=minCharacters && segment.length()<=maxCharacters)
                 {
-                    wordSet.add(lemmatize(segment.toLowerCase()));
+                    wordSet.add(segment.toLowerCase());
                 }
             }
+            
+            // Lemmatize unique words
+            
+            HashSet<String> lemmatizedSet = new HashSet<String>();
+            StringBuilder b = new StringBuilder();
+            
             for(String w: wordSet)
+            {
+                b.append(w).append(" ");
+            }
+            
+            Annotation annotation = new Annotation(b.toString());
+            pipeline.annotate(annotation);
+            
+            for(CoreLabel token: annotation.get(CoreAnnotations.TokensAnnotation.class))
+            {
+                String lemma = token.lemma();
+                lemmatizedSet.add(lemma==null?token.originalText():lemma);
+            }
+            
+            // Exclude words and add remaining to vocab
+            
+            for(String w: lemmatizedSet)
             {
                 exclude = false;
                 
@@ -89,6 +123,7 @@ public class TFIDFVectorSpaceInputSequenceInstance implements InputSequenceInsta
             
             System.out.println("[TFIDFVectorSpaceInputSequenceInstance] Preprocessed text record: "+totalProcessedRecords);
         }
+        
         for(String w: new ArrayList<String>(words.keySet()))
         {
             if(words.get(w).getRecordsContainingWord()<minOccurrances)
