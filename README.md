@@ -35,7 +35,7 @@ The JSON training configuration file has the following structure:
 		"max-epochs": 100,
 		"batch-size": 128
 	},
-	"model-instance-builder": "au.gov.nla.dnn.model.mln.MultiLayerNetworkModelInstance.Builder",
+	"model-instance-builder": "au.gov.nla.dnn.model.mln.MultiLayerNetworkModelInstanceBuilder",
 	"model-instance-builder-config": {
 		"weight-init": "RELU",
 		"activation-function": "RELU",
@@ -43,7 +43,7 @@ The JSON training configuration file has the following structure:
 		"updater": "nesterovs",
 		"updater-params": {
 			"learning-rate": 0.1,
-			"momentum": 0.01
+			"momentum": 0.9
 		},
 		"hidden-layers": [
 			{
