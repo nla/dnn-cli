@@ -16,16 +16,23 @@ public class TFIDFVectorSpaceInputSequenceInstance implements InputSequenceInsta
 {
     private static final long serialVersionUID = 1L;
     
+    private String wordSplitPattern;
+    private List<String> exclusionPatterns;
     private int minCharacters;
+    private int maxCharacters;
     private int minOccurrances;
     private List<String> labelList;
     
     private LinkedHashMap<String, Word> words;
     private double totalProcessedRecords;
     
-    public TFIDFVectorSpaceInputSequenceInstance(int minCharacters, int minOccurrances, List<String> labelList)
+    public TFIDFVectorSpaceInputSequenceInstance(String wordSplitPattern, List<String> exclusionPatterns, 
+            int minCharacters, int maxCharacters, int minOccurrances, List<String> labelList)
     {
+        this.wordSplitPattern = wordSplitPattern;
+        this.exclusionPatterns = exclusionPatterns;
         this.minCharacters = minCharacters;
+        this.maxCharacters = maxCharacters;
         this.minOccurrances = minOccurrances;
         this.labelList = labelList;
         this.words = new LinkedHashMap<String, Word>();
@@ -43,6 +50,7 @@ public class TFIDFVectorSpaceInputSequenceInstance implements InputSequenceInsta
     
     public void preProcess(long randomSeed, RawDataRecordProvider recordProvider) throws Exception
     {
+        boolean exclude;
         words.clear();
         
         while(recordProvider.hasMoreRecords())
@@ -53,17 +61,30 @@ public class TFIDFVectorSpaceInputSequenceInstance implements InputSequenceInsta
             HashSet<String> wordSet = new HashSet<String>();
             String data = new String(record.getData());
             
-            for(String segment: data.split("\\s+"))
+            for(String segment: data.split(wordSplitPattern))
             {
-                if(segment.length()>=minCharacters)
+                if(segment.length()>=minCharacters && segment.length()<=maxCharacters)
                 {
-                    wordSet.add(segment);
+                    wordSet.add(lemmatize(segment.toLowerCase()));
                 }
             }
             for(String w: wordSet)
             {
-                Word word = getWord(w);
-                word.setRecordsContainingWord(word.getRecordsContainingWord()+1);
+                exclude = false;
+                
+                for(String pattern: exclusionPatterns)
+                {
+                    if(w.matches(pattern))
+                    {
+                        exclude = true;
+                        break;
+                    }
+                }
+                if(!exclude)
+                {
+                    Word word = getWord(w);
+                    word.setRecordsContainingWord(word.getRecordsContainingWord()+1);
+                }
             }
             
             System.out.println("[TFIDFVectorSpaceInputSequenceInstance] Preprocessed text record: "+totalProcessedRecords);
