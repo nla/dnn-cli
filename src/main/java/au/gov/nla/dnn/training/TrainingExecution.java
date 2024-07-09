@@ -110,10 +110,10 @@ public class TrainingExecution
         }
         
         RawDataRecordProvider trainingRecordProvider = (RawDataRecordProvider)Class.forName(config.getString("training-record-provider")).getConstructor().newInstance();
-        trainingRecordProvider.initialise(config.getJSONObject("training-record-provider-config"), errorHandler);
+        trainingRecordProvider.initialise(config.getJSONObject("training-record-provider-config"), labels, errorHandler);
         
         RawDataRecordProvider evaluationRecordProvider = (RawDataRecordProvider)Class.forName(config.getString("evaluation-record-provider")).getConstructor().newInstance();
-        evaluationRecordProvider.initialise(config.getJSONObject("evaluation-record-provider-config"), errorHandler);
+        evaluationRecordProvider.initialise(config.getJSONObject("evaluation-record-provider-config"), labels, errorHandler);
         
         InputSequence sequence = (InputSequence)Class.forName(config.getString("input-sequence")).getConstructor().newInstance();
         InputSequenceInstance sequenceInstance;
