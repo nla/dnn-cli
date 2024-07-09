@@ -65,6 +65,8 @@ public class TFIDFVectorSpaceInputSequenceInstance implements InputSequenceInsta
                 Word word = getWord(w);
                 word.setRecordsContainingWord(word.getRecordsContainingWord()+1);
             }
+            
+            System.out.println("[TFIDFVectorSpaceInputSequenceInstance] Preprocessed text record: "+totalProcessedRecords);
         }
         for(String w: new ArrayList<String>(words.keySet()))
         {
@@ -73,6 +75,8 @@ public class TFIDFVectorSpaceInputSequenceInstance implements InputSequenceInsta
                 words.remove(w);
             }
         }
+        
+        System.out.println("[TFIDFVectorSpaceInputSequenceInstance] Total words: "+words.size());
     }
     
     public SequenceDataRecord process(RawDataRecord record)
@@ -116,6 +120,7 @@ public class TFIDFVectorSpaceInputSequenceInstance implements InputSequenceInsta
             wordIndex++;
         }
         
+        System.out.println("[TFIDFVectorSpaceInputSequenceInstance] Processed text record: "+features);
         return new SequenceDataRecord(features, record.getLabels());
     }
     
