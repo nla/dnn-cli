@@ -3,6 +3,7 @@ package au.gov.nla.dnn.record.file;
 import java.io.File;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.List;
@@ -78,7 +79,16 @@ public class FileDataRecordProvider implements RawDataRecordProvider
                 else
                 {
                     directoryStream.close();
-                    createStream();
+                    
+                    try
+                    {
+                        createStream();
+                    }
+                    catch(NoSuchFileException e)
+                    {
+                        currentLabelIndex++;
+                    }
+                    
                     return hasMoreRecords();
                 }
             }
