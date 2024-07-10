@@ -109,12 +109,6 @@ public class TrainingExecution
             labels.add(labelArray.getString(i));
         }
         
-        RawDataRecordProvider trainingRecordProvider = (RawDataRecordProvider)Class.forName(config.getString("training-record-provider")).getConstructor().newInstance();
-        trainingRecordProvider.initialise(config.getJSONObject("training-record-provider-config"), labels, errorHandler);
-        
-        RawDataRecordProvider evaluationRecordProvider = (RawDataRecordProvider)Class.forName(config.getString("evaluation-record-provider")).getConstructor().newInstance();
-        evaluationRecordProvider.initialise(config.getJSONObject("evaluation-record-provider-config"), labels, errorHandler);
-        
         InputSequence sequence = (InputSequence)Class.forName(config.getString("input-sequence")).getConstructor().newInstance();
         InputSequenceInstance sequenceInstance;
         
@@ -125,6 +119,12 @@ public class TrainingExecution
         }
         else
         {
+            RawDataRecordProvider trainingRecordProvider = (RawDataRecordProvider)Class.forName(config.getString("training-record-provider")).getConstructor().newInstance();
+            trainingRecordProvider.initialise(config.getJSONObject("training-record-provider-config"), labels, errorHandler);
+            
+            RawDataRecordProvider evaluationRecordProvider = (RawDataRecordProvider)Class.forName(config.getString("evaluation-record-provider")).getConstructor().newInstance();
+            evaluationRecordProvider.initialise(config.getJSONObject("evaluation-record-provider-config"), labels, errorHandler);
+            
             sequenceInstance = sequence.generateInstance(labels, config.getJSONObject("input-sequence-config"));
             saveSequenceInstance(sequenceInstance, dataTempSequenceInstance);
             
