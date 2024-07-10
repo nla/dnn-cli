@@ -79,6 +79,8 @@ public class TrainingExecution
                 randomSeed, 
                 evaluationMetric);
         
+        boolean reuseCache = config.has("reuse-cached-sequence-data") && config.getBoolean("reuse-cached-sequence-data");
+        
         File modelTempDirectoryF = new File(tempDirectory+"/model/");
         File dataTempDirectoryF = new File(tempDirectory+"/data/");
         File dataTempDirectoryFT = new File(tempDirectory+"/data/t/");
@@ -89,9 +91,10 @@ public class TrainingExecution
         {
             modelTempDirectoryF.mkdirs();
         }
-        
-        deleteDirectory(dataTempDirectoryF);
-        
+        if(!reuseCache)
+        {
+            deleteDirectory(dataTempDirectoryF);
+        }
         if(!dataTempDirectoryFT.exists())
         {
             dataTempDirectoryFT.mkdirs();
@@ -112,7 +115,7 @@ public class TrainingExecution
         InputSequence sequence = (InputSequence)Class.forName(config.getString("input-sequence")).getConstructor().newInstance();
         InputSequenceInstance sequenceInstance;
         
-        if(config.has("reuse-cached-sequence-data") && config.getBoolean("reuse-cached-sequence-data"))
+        if(reuseCache)
         {
             sequenceInstance = loadSequenceInstance(dataTempSequenceInstance);
             System.out.println("Loaded cached sequence data. Feature size is: "+sequenceInstance.getFeatureCount()+".");
