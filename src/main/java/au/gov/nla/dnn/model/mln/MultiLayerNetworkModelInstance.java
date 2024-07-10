@@ -61,7 +61,24 @@ public class MultiLayerNetworkModelInstance implements ModelInstance
             public void onBackwardPass(Model model){}
             public void onEpochEnd(Model model)
             {
-                listener.onEpochComplete(epochCounter.incrementAndGet(), bestEpoch.intValue(), bestEpochScore.doubleValue());
+                int epoch = epochCounter.incrementAndGet();
+                
+                try
+                {
+                    ModelEvaluationResult eval = evaluate(evaluationRecordProvider, hyperParameters.getBatchSize(), featureCount, labels, errorHandler);
+                    
+                    if(eval.getAccuracy()>bestEpochScore.get())
+                    {
+                        bestEpochScore.set(eval.getAccuracy());
+                        bestEpoch.set(epoch);
+                    }
+                }
+                catch(Exception e)
+                {
+                    errorHandler.accept(e);
+                }
+                
+                listener.onEpochComplete(epoch, bestEpoch.intValue(), bestEpochScore.doubleValue());
             }
         });
         
@@ -95,6 +112,7 @@ public class MultiLayerNetworkModelInstance implements ModelInstance
             List<String> labels, Consumer<Exception> errorHandler) throws Exception
     {
         AsyncDataSetIterator evaluationIterator = new AsyncDataSetIterator(new SequenceDataRecordIterator(batchSize, featureCount, labels, evaluationRecordProvider, errorHandler), 3, true);
+        evaluationIterator.reset();
         
         LinkedHashMap<String, Double> accuracyRatings = new LinkedHashMap<String, Double>();
         LinkedHashMap<String, ConfusionStatistics> confusionMatrix = new LinkedHashMap<String, ConfusionStatistics>();
