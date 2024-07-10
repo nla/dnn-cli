@@ -63,19 +63,10 @@ public class MultiLayerNetworkModelInstance implements ModelInstance
             {
                 int epoch = epochCounter.incrementAndGet();
                 
-                try
+                if(model.score()>bestEpochScore.get())
                 {
-                    ModelEvaluationResult eval = evaluate(evaluationRecordProvider, hyperParameters.getBatchSize(), featureCount, labels, errorHandler);
-                    
-                    if(eval.getAccuracy()>bestEpochScore.get())
-                    {
-                        bestEpochScore.set(eval.getAccuracy());
-                        bestEpoch.set(epoch);
-                    }
-                }
-                catch(Exception e)
-                {
-                    errorHandler.accept(e);
+                    bestEpochScore.set(model.score());
+                    bestEpoch.set(epoch);
                 }
                 
                 listener.onEpochComplete(epoch, bestEpoch.intValue(), bestEpochScore.doubleValue());
