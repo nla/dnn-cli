@@ -126,11 +126,11 @@ public class TrainingExecution
             evaluationRecordProvider.initialise(config.getJSONObject("evaluation-record-provider-config"), labels, errorHandler);
             
             sequenceInstance = sequence.generateInstance(labels, config.getJSONObject("input-sequence-config"));
-            saveSequenceInstance(sequenceInstance, dataTempSequenceInstance);
             
             System.out.println("Pre-processing raw input data...");
             
             sequenceInstance.preProcess(randomSeed, trainingRecordProvider);
+            saveSequenceInstance(sequenceInstance, dataTempSequenceInstance);
             trainingRecordProvider.reset();
             
             System.out.println("Generating sequence data...");
