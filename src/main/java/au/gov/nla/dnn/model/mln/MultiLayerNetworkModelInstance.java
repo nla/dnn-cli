@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import org.deeplearning4j.earlystopping.EarlyStoppingConfiguration;
 import org.deeplearning4j.earlystopping.EarlyStoppingResult;
+import org.deeplearning4j.earlystopping.listener.EarlyStoppingListener;
 import org.deeplearning4j.earlystopping.saver.LocalFileModelSaver;
 import org.deeplearning4j.earlystopping.termination.MaxEpochsTerminationCondition;
 import org.deeplearning4j.earlystopping.trainer.EarlyStoppingTrainer;
@@ -61,15 +62,7 @@ public class MultiLayerNetworkModelInstance implements ModelInstance
             public void onBackwardPass(Model model){}
             public void onEpochEnd(Model model)
             {
-                int epoch = epochCounter.incrementAndGet();
-                
-                if(model.score()>bestEpochScore.get())
-                {
-                    bestEpochScore.set(model.score());
-                    bestEpoch.set(epoch);
-                }
-                
-                listener.onEpochComplete(epoch, bestEpoch.intValue(), bestEpochScore.doubleValue());
+                listener.onEpochComplete(epochCounter.get(), bestEpoch.intValue(), bestEpochScore.doubleValue());
             }
         });
         
@@ -85,6 +78,20 @@ public class MultiLayerNetworkModelInstance implements ModelInstance
                 .modelSaver(new LocalFileModelSaver(tempDirectory))
                 .build();
         EarlyStoppingTrainer trainer = new EarlyStoppingTrainer(config, network, trainingIterator);
+        trainer.setListener(new EarlyStoppingListener<MultiLayerNetwork>(){
+            public void onStart(EarlyStoppingConfiguration<MultiLayerNetwork> esConfig, MultiLayerNetwork net){}
+            public void onCompletion(EarlyStoppingResult<MultiLayerNetwork> esResult){}
+            public void onEpoch(int epochNum, double score, EarlyStoppingConfiguration<MultiLayerNetwork> esConfig, MultiLayerNetwork net)
+            {
+                if(score>bestEpochScore.get())
+                {
+                    bestEpochScore.set(score);
+                    bestEpoch.set(epochNum);
+                }
+                
+                epochCounter.set(epochNum);
+            }
+        });
         
         EarlyStoppingResult<MultiLayerNetwork> result = trainer.fit();
         
